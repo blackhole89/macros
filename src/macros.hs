@@ -25,41 +25,42 @@ import qualified Data.List as List
 import Data.Maybe
 import System.Environment
 import System.IO (hPutStrLn,stderr)
+import System.FilePath
 
 import Types
 import Parser
 import MacroProcessor
                   
 {- ### @include processing in IO monad ### -}
-process_include ((Include s):cs) = do c <- process_file s
-                                      cs' <- process_include cs
-                                      return $ c++cs'
+process_include d ((Include s):cs) = do c <- process_file d s
+                                        cs' <- process_include d cs
+                                        return $ c++cs'
 {- -- for now, include can only exist at top level
-process_include ((Parentheses c):cs) = do c' <- Parentheses <$> process_include c
-                                  cs' <- process_include cs
-                                  return $ c':cs'
-process_include ((CurlyBraces c):cs) = do c' <- CurlyBraces <$> process_include c
-                                  cs' <- process_include cs
-                                  return $ c':cs'
-process_include ((SquareBrackets c):cs) = do c' <- SquareBrackets <$> process_include c
-                                     cs' <- process_include cs
-                                     return $ c':cs'
+process_include d ((Parentheses c):cs) = do c' <- Parentheses <$> process_include d c
+                                            cs' <- process_include d cs
+                                            return $ c':cs'
+process_include d ((CurlyBraces c):cs) = do c' <- CurlyBraces <$> process_include d c
+                                            cs' <- process_include d cs
+                                            return $ c':cs'
+process_include d ((SquareBrackets c):cs) = do c' <- SquareBrackets <$> process_include d c
+                                               cs' <- process_include d cs
+                                               return $ c':cs'
 -}
-process_include (c:cs) = do cs' <- process_include cs
-                            return $ c:cs'
-process_include [] = return []
+process_include d (c:cs) = do cs' <- process_include d cs
+                              return $ c:cs'
+process_include d [] = return []
 
-process_file fn = do input <- readFile fn
-                     case do_parse fn input of
+process_file d fn = do input <- readFile (d </> fn)
+                       case do_parse fn input of
                          Left e -> do hPutStrLn stderr $ "Parse error: "++show e
                                       return []
-                         Right c -> do c' <- process_include c
+                         Right c -> do c' <- process_include (takeDirectory (d </> fn)) c
                                        return c'
 
 {- ### CLI ### -}
 
 main = do args <- getArgs
-          c <- process_file (head args)
+          c <- process_file "" (head args)
           f <- return $ case (tail args) of
             ["-n"] -> strip_newlines 
             _ -> \x -> x

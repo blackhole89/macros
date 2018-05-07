@@ -1,0 +1,6 @@
+#!/bin/bash
+TMPFILE=`mktemp --suffix=$(basename $2)`
+./macros $2 > $TMPFILE
+$1 $TMPFILE ${@:3} 
+rm $TMPFILE
+
