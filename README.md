@@ -77,37 +77,54 @@ List of directives
 **Macros and pattern matching**
 
 * `@define keyword { ( pattern ) => ( outcome ) ... }`: Defines a new macro `keyword`. The token stream after `keyword` will be matched in turn against each `pattern`. If a pattern is matched against successfully, a new stack frame is instantiated with all variables captured by the pattern, the corresponding `outcome` is processed in the new stack frame and emplaced instead of `keyword` plus the matching token stream.
-
 * `@undef keyword`: Undefines the macro `keyword`.
-
 * `@match ( token-stream ) { ( pattern ) => ( outcome ) ... }`: Processes `token-stream`, and attempts to match the result against each `pattern` in turn, analogously to an `@define`d macro.
+
+**Variable capture**
+
+The following are only valid in `pattern`s.
+
+* `$var`: Matches any single token. Stores the result in `$var`.
+* `@#$var`: Matches any *name*, i.e. C/C++ *identifier*.
+* `@^[stop-token-stream-1]...[stop-token-stream-n]$var`: Matches an arbitrarily long token stream until any one of the `stop-token-stream`s is encountered, or the token stream ends (via end-of-file or a closing parenthesis). The form `@^$var` is permissible. Each `stop-token-stream` must be *shallow*: behaviour is unspecified if it contains any brackets with nonempty contents. Since all token streams must be bracket-matched, use `@^[{}]$var` to stop when a block of curly braces is encountered.
+  * Example:
+    ```c++
+    @define test { ( @^[a][b][{}]$v ) => () }
+    test c d a b { e }; // -> a b { e };
+    test c d b a { e }; // -> b a { e };
+    test { e }; // -> { e };
+    ```
+* `@*[separator-token-stream]( pattern )`: Matches zero or more of `pattern`, optionally separated by `separator-token-stream`. (The parameter, along with its `[]`, may be omitted.) Any variables captured in `pattern` will be put into a list.
+   * So for instance, `@*[,]( @^[,]$param )` will capture a comma-separated list of token streams, and put them in the list `$param`. Given the input
+     `hello world, goodbye world, 1+2`, this will generate a `value-spec` analogous to `@[ (hello world), (goodbye world), (1+2) ]`.
+* `@+[separator-token-stream]( pattern )`: As above, but matches one or more.
 
 **Variables**
 
 * `$varname`: Evaluates to the currently visible instance of `$varname`. The visible instance is either the topmost (most recent) definition of `$varname` on the stack,
-
 * `@var $varname ( token-stream )`: Defines a variable `$varname` in the local stack frame, processes the `token-stream` and sets the value of `$varname` to the result.
-
 * `@global $varname ( token-stream )`: Defines a global variable `$varname`, processes the `token-stream` and sets the value of `$varname` to the result.
-
 * `@set $varname value-spec`: Processes the `value-spec`. Then sets the value of the currently visible instance of `$varname` to the result.
   * A `value-spec` is either a singleton `(token-stream)`, or a list `@[ value-spec, ..., value-spec ]`.
-
 * `@push_back $varname value-spec`: Processes the `value-spec`. Then appends the result to the currently visible instance `$varname`. If this instance is not a list, an error is thrown.
-
-* `@for[ separator-token-steam ]( bind-spec )( body-token-stream )`, where `[ separator-token-stream ]` is optional: iterates over lists according to `bind-spec`. For each entry, instantiates a new stack frame with the bound variables, processes `body-token-stream` in the frame and emits the result.
+* `@for[ separator-token-steam ]( bind-spec )( body-token-stream )`, where `[ separator-token-stream ]` is optional: iterates over lists according to `bind-spec`. For each entry, instantiates a new stack frame with the bound variables, processes `body-token-stream` in the frame and emits the result. If `separator-token-stream` is nonempty, it is processed and emitted between each two `body-token-stream`s.
   * `bind-spec` takes the form `$v1,...,$vn : $l1,...,$ln`, where the `$l1,...,$ln` are lists of identical length.
+  * Example usage:
+    ```c++
+        @var $listone @[ (1), (2), (3) ]
+        @var $listtwo @[ (a), (b), (c) ]
+        @for[,]( $a,$b : $listone,$listtwo )(
+            $a @@ $b
+        )
+        // outputs: 1a, 2b, 3c
+    ```
 
 **Token stream operations**
 
 * `@@`: Concatenates the preceding and following token: `a @@ b` evaluates to `ab`. Compare `##` in `cpp`.
-
 * `@!(token-stream)`/`@![token-stream]`/`@!{token-stream}`/`@!single-token`: Emits `token-stream` or `single-token` without processing.
-
 * `@unquote "any string"`: Emits `any string`.
-
 * `@quote (token-stream)`: Emits `"token-stream"` as a string literal.
-
 * `@calc (token-stream)`: Processes `token-stream`, then attempts to evaluate it as an integer arithmetic expression. Substitutes in the result. Supported operators are `+`, `-`, `*` and `+`. Throws an error if the parameter is not an integer arithmetic expression.
 
 **File management**
