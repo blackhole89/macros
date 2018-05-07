@@ -43,5 +43,14 @@ The fundamental principle of <macros> is **keyword-triggered pattern-matching an
     // ...
 }
 ```
-This defines a macro that is triggered by encountering the keyword `macroname` *anywhere in the program text following the definition*. 
+This defines a macro that is triggered by encountering the keyword `macroname` anywhere in the program text following the definition. If the keyword is encountered, the macro processor will proceed to try and match the token stream following it against the patterns – the token streams inside the left-hand side parentheses of a pair of the form `(stream) => (stream)` in the definition body in turn. For the first left-hand pattern that fully matches the token stream following the keyword, the corresponding right-hand stream will be substituted in for the keyword *and* the matching tokens. If no patterns match, an error is thrown.
+ 
+So for instance,
+```c++
+macroname pattern two;
+macroname pattern one;
+/* will become:
+ * printf("second pattern encountered");
+ * printf("first pattern encountered"); */
+```
 
