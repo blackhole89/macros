@@ -31,6 +31,23 @@ struct {
 LinkedList *l = MakeList {1,2,3,4,5};
 ```
 
+Usage
+-----
+
+Make sure you have `ghc` 7.x or higher installed. Run `make` in the root directory of the repository. This generates an executable file named `macros`.
+Running
+```
+./macros <input file>
+```
+will emit the processed output to `stdout`. If any errors are encountered, they will be printed to `stderr`.
+For convenience, a wrapper script `with-macro` is included.
+Running
+```
+./with-macro g++ <input file> -O2 -Dotheroptions
+```
+(with the input filename being in the second position, i.e. immediately following the compiler executable!) is equivalent to running
+`g++ -O2 -Dotheroptions` on the output of the preprocessor on `<input file>`.
+
 Introduction
 ------------
 
@@ -48,9 +65,52 @@ This defines a macro that is triggered by encountering the keyword `macroname` a
 So for instance,
 ```c++
 macroname pattern two;
-macroname pattern one;
+macroname pattern one two three four;
 /* will become:
  * printf("second pattern encountered");
- * printf("first pattern encountered"); */
+ * printf("first pattern encountered") two three four; */
 ```
+
+List of directives
+------------------
+
+**Macros and pattern matching**
+
+* `@define keyword { ( pattern ) => ( outcome ) ... }`: Defines a new macro `keyword`. The token stream after `keyword` will be matched in turn against each `pattern`. If a pattern is matched against successfully, a new stack frame is instantiated with all variables captured by the pattern, the corresponding `outcome` is processed in the new stack frame and emplaced instead of `keyword` plus the matching token stream.
+
+* `@undef keyword`: Undefines the macro `keyword`.
+
+* `@match ( token-stream ) { ( pattern ) => ( outcome ) ... }`: Processes `token-stream`, and attempts to match the result against each `pattern` in turn, analogously to an `@define`d macro.
+
+**Variables**
+
+* `$varname`: Evaluates to the currently visible instance of `$varname`. The visible instance is either the topmost (most recent) definition of `$varname` on the stack,
+
+* `@var $varname ( token-stream )`: Defines a variable `$varname` in the local stack frame, processes the `token-stream` and sets the value of `$varname` to the result.
+
+* `@global $varname ( token-stream )`: Defines a global variable `$varname`, processes the `token-stream` and sets the value of `$varname` to the result.
+
+* `@set $varname value-spec`: Processes the `value-spec`. Then sets the value of the currently visible instance of `$varname` to the result.
+  * A `value-spec` is either a singleton `(token-stream)`, or a list `@[ value-spec, ..., value-spec ]`.
+
+* `@push_back $varname value-spec`: Processes the `value-spec`. Then appends the result to the currently visible instance `$varname`. If this instance is not a list, an error is thrown.
+
+* `@for[ separator-token-steam ]( bind-spec )( body-token-stream )`, where `[ separator-token-stream ]` is optional: iterates over lists according to `bind-spec`. For each entry, instantiates a new stack frame with the bound variables, processes `body-token-stream` in the frame and emits the result.
+  * `bind-spec` takes the form `$v1,...,$vn : $l1,...,$ln`, where the `$l1,...,$ln` are lists of identical length.
+
+**Token stream operations**
+
+* `@@`: Concatenates the preceding and following token: `a @@ b` evaluates to `ab`. Compare `##` in `cpp`.
+
+* `@!(token-stream)`/`@![token-stream]`/`@!{token-stream}`/`@!single-token`: Emits `token-stream` or `single-token` without processing.
+
+* `@unquote "any string"`: Emits `any string`.
+
+* `@quote (token-stream)`: Emits `"token-stream"` as a string literal.
+
+* `@calc (token-stream)`: Processes `token-stream`, then attempts to evaluate it as an integer arithmetic expression. Substitutes in the result. Supported operators are `+`, `-`, `*` and `+`. Throws an error if the parameter is not an integer arithmetic expression.
+
+**File management**
+
+* `@include "filename"`: Includes and processes the file `filename`, relative to the current file's directory.
 
