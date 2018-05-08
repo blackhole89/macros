@@ -43,6 +43,8 @@ template<class T> void print_list(List<T> l,char *fmt)
 template<class T> List<T> unions(List<List<T>> ls)
 {
     match(ls) {
+    case Cons(&xs,Nil):
+        return xs;
     case Cons(Cons(&x,&xs),&ys):
         return Cons(x, unions(Cons(xs,ys)));
     case Cons(Nil,&ys):
