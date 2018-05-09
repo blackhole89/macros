@@ -5,7 +5,9 @@ The venerable C preprocessor (cpp) – the part of the compilation process that 
 
 This project is an attempt to create a Turing-complete general-purpose preprocessor for C and C++ that is powerful enough to subsume all of the above and more: indeed, we shall aim to be able to build on top of either C or C++ in the way the latter was originally built upon the former, while seamlessly blending in with existing code as the C preprocessor does. 
 
-We draw significant inspiration from [Rust's macro system](https://doc.rust-lang.org/nightly/book/second-edition/appendix-04-macros.html), which appears to be the most ambitious such effort this side of LISP, without binding ourselves to its sometimes curious choice of syntax or its demand of [hygiene](https://en.wikipedia.org/wiki/Hygienic_macro) (this is C, after all!). Since all respectable programming language projects are self-hosting and this is not one of them respectable programming language projects, the preprocessor itself is written in [Haskell](https://en.wikipedia.org/wiki/Haskell).
+We draw significant inspiration from [Rust's macro system](https://doc.rust-lang.org/nightly/book/second-edition/appendix-04-macros.html), which appears to be the most ambitious such effort this side of LISP, without binding ourselves to its sometimes curious choice of syntax or its demand of [hygiene](https://en.wikipedia.org/wiki/Hygienic_macro) (this is C, after all!). Since all respectable programming language projects are self-hosting and this is not one of them respectable programming language projects, the preprocessor itself is written in [Haskell](https://en.wikipedia.org/wiki/Haskell). The usual warnings about alpha-quality software apply, and all syntax and semantics is subject to change.
+
+[Try it out online here!](http://exosphere.kafuka.org/macros-test/)
 
 Example
 -------
