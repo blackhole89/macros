@@ -64,8 +64,8 @@ data MacroError =   AllRulesFailed [SubstRule]
 -- ## pretty-print error ## --
 instance Show MacroError where
     show (AllRulesFailed rs) =   "No patterns matched in macro application. List of failure points:\n"
-                               ++(List.intercalate "\n" $ map (\(x,y) -> "  PATTERN: "++(take 300 $ show x)++"...\n"++
-                                                                         "  INPUT:   "++(take 300 $ show y)++"...") rs)
+                               ++(List.intercalate "\n" $ map (\(x,y) -> "  PATTERN: "++(take 30 $ to_string_all x)++"...\n"++
+                                                                         "  INPUT:   "++(take 30 $ to_string_all y)++"...") rs)
     show (UnknownVar s) = "Unknown variable $"++s++"."
     show (IllegalInstance s) = "Can't directly instantiate list $"++s++"."
     show (InconsistentLengths vs) = "Inconsistent list lengths in lockstep iteration: "++(List.intercalate "," $ map ('$':) vs)++"."

@@ -36,7 +36,7 @@ LinkedList *l = MakeList {1,2,3,4,5};
 Usage
 -----
 
-Make sure you have a recent version of `ghc`, `mtl`>=2.2.1 and `parsec` installed. Run `make` in the root directory of the repository. This generates an executable file named `macros`.
+Make sure you have a recent version of `ghc`, `mtl`>=2.2.1 and `parsec` installed. The appropriate packages exist in Debian *testing* repositories as `ghc`, `libghc-mtl-dev` and `libghc-parsec3-dev` respectively; building under Windows or other unixoid OS families is currently untested. Run `make` in the root directory of the repository. This generates an executable file named `macros`.
 Running
 ```
 ./macros <input file>
