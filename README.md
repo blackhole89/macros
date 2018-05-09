@@ -72,6 +72,23 @@ macroname pattern one two three four;
  * printf("second pattern encountered");
  * printf("first pattern encountered") two three four; */
 ```
+The pattern of a macro can also *capture* tokens in compile-time variables, which are recognisable by the sigil `$`. The results of such a capture can be reused on the right-hand side. In the simplest case, we capture a single token:
+```
+@define greet {
+	( $name ) => ( printf("Hello %s!", $name) )
+}
+
+greet "world";
+```
+Multiple tokens can be captured in one variable by using the modifier `@^`, which is followed by any number of *stop patterns* `[token-stream]`. If any stop pattern is encountered or the token stream ends, capture terminates.
+```
+@define bracketless_printf {
+    ( $pattern, @^[;]$args ) => (
+        printf($pattern, $args)
+    )
+}
+bracketless_printf "%d %d",1,2;
+```
 
 List of directives
 ------------------
