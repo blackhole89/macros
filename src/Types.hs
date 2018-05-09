@@ -84,6 +84,7 @@ to_string (NewLine s f l) = s++"#line "++(show l)++" "++(show f)++"\n"
 to_string (Direct c) = "/* @! */"++(to_string_all c)++"/* !@ */"
 to_string (Concat) = ""
 to_string (Unquote s) = s
+to_string (Quote c) = "\""++(to_string_all c)++"\""
 -- none of these should actually ever be emitted
 to_string (Include s) = "/* @include "++s++" */"
 to_string (Define s ls) = "/* @define "++s++" */"

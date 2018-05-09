@@ -64,8 +64,8 @@ data MacroError =   AllRulesFailed [SubstRule]
 -- ## pretty-print error ## --
 instance Show MacroError where
     show (AllRulesFailed rs) =   "No patterns matched in macro application. List of failure points:\n"
-                               ++(List.intercalate "\n" $ map (\(x,y) -> "  PATTERN: "++(take 30 $ to_string_all x)++"...\n"++
-                                                                         "  INPUT:   "++(take 30 $ to_string_all y)++"...") rs)
+                               ++(List.intercalate "\n" $ map (\(x,y) -> "  PATTERN: "++(take 300 $ show x)++"...\n"++
+                                                                         "  INPUT:   "++(take 300 $ show y)++"...") rs)
     show (UnknownVar s) = "Unknown variable $"++s++"."
     show (IllegalInstance s) = "Can't directly instantiate list $"++s++"."
     show (InconsistentLengths vs) = "Inconsistent list lengths in lockstep iteration: "++(List.intercalate "," $ map ('$':) vs)++"."
@@ -313,7 +313,7 @@ try_unif ((OneOrMore c s):ls) rs = let mklist rs = do pushFrame Map.empty
 -- process contents fully before unifying!
 try_unif ((Parentheses l):ls) ((Parentheses r):rs) = do r' <- process r
                                                         tail <- try_unif l r
-                                                        if tail == [] then try_unif ls rs
+                                                        if (trim tail) == [] then try_unif ls rs
                                                         else throwError $ CantUnify (l,r)
 try_unif ((CurlyBraces l):ls) ((CurlyBraces r):rs) = try_unif ((Parentheses l):ls) ((Parentheses r):rs)
 try_unif ((SquareBrackets l):ls) ((SquareBrackets r):rs) = try_unif ((Parentheses l):ls) ((Parentheses r):rs)
