@@ -1,4 +1,5 @@
-== Windows installation instructions ==
+Windows installation instructions
+=================================
 
 The following guide is due to Reddit's [/u/zom-ponks](https://www.reddit.com/r/cpp/comments/8i3ya3/a_more_powerful_macro_preprocessor_for_cc/dyoyizq/).
 
