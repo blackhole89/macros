@@ -15,16 +15,16 @@ The following guide is due to Reddit's [/u/zom-ponks](https://www.reddit.com/r/c
         * Test: run `ghc` on the command line (restart console for environment changes to take effect)
 * Now clone the repository somewhere convenient 
     * For instance: 
-        * `cd c:\\dev`
+        * `cd c:\dev`
         * `git clone https://github.com/blackhole89/macros.git`
     * Build:
         * Visual Studio (again, from the "Visual Studio Command Prompt")
-            * `cd \\dev\\macros`
+            * `cd \dev\macros`
             * `nmake -f Makefile`
         * MinGW
-            * `cd \\dev\\macros`
+            * `cd \dev\macros`
             * `make`
-* Now you should have a "macros.exe" in the root of the project(in this example `c:\\dev\\macros\\`)
+* Now you should have a "macros.exe" in the root of the project(in this example `c:\dev\macros\`)
     * Copy it somewhere that's in PATH
         * `mkdir \tools`
         * `copy macros.exe \tools`
