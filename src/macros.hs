@@ -23,6 +23,8 @@ import qualified Data.Map as Map
 import Data.Map (Map,(!))
 import qualified Data.List as List
 import Data.Maybe
+import Data.Functor ((<$>))
+
 import System.Environment
 import System.IO (hPutStrLn,stderr)
 import System.FilePath

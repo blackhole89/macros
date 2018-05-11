@@ -31,6 +31,7 @@ import qualified Data.Map as Map
 import Data.Map (Map,(!))
 import qualified Data.List as List
 import Data.Maybe
+import Data.Functor ((<$>))
 
 import Text.Parsec hiding (State)
 import Control.Monad.State.Lazy
