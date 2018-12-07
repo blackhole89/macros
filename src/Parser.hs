@@ -165,7 +165,7 @@ parse_direct = do reservedOp "@!"
                   c <- ( parens parser <|> brackets parser <|> braces parser <|> (parse_one >>= return.(:[])) )
                   return (Direct c)
 -- @eval a piece of code that is evaluated twice (so e.g. the contents of variables are macro-expanded)
-parse_eval = do reservedOp "@eval"
+parse_eval = do reserved "@eval"
                 c <- ( parens parser <|> brackets parser <|> braces parser <|> (parse_one >>= return.(:[])) )
                 return (Eval c)
 -- concatenate two tokens, cf. ##
