@@ -142,6 +142,7 @@ The following are only valid in `pattern`s.
 
 * `@@`: Concatenates the preceding and following token: `a @@ b` evaluates to `ab`. Compare `##` in `cpp`.
 * `@!(token-stream)`/`@![token-stream]`/`@!{token-stream}`/`@!single-token`: Emits `token-stream` or `single-token` without processing.
+* `@eval (token-stream)`/`@eval [token-stream]`/`@eval {token-stream}`/`@eval single-token`: Processes `token-stream` or `single-token` twice and emits the result, so e.g. a variable containing an unprocessed token stream is evaluated.
 * `@unquote "any string"`: Emits `any string`.
 * `@quote (token-stream)`: Emits `"token-stream"` as a string literal.
 * `@calc (token-stream)`: Processes `token-stream`, then attempts to evaluate it as an integer arithmetic expression. Substitutes in the result. Supported operators are `+`, `-`, `*` and `+`. Throws an error if the parameter is not an integer arithmetic expression.

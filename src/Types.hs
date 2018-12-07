@@ -43,7 +43,8 @@ data Code =   CPPDirective String
             | SetVar String VarTree
             | PushBack String VarTree
             | Match [Code] [SubstRule]    -- match processed code
-            | Direct [Code]               -- force no substitution
+            | Direct [Code]               -- force no processing
+            | Eval [Code]                 -- force double processing
             | Var String
             | CaptureName String
             | CaptureUntil String [[Code]] 
@@ -82,6 +83,7 @@ to_string (Other s) = s
 to_string (WhiteSpace s) = s
 to_string (NewLine s f l) = s++"#line "++(show l)++" "++(show f)++"\n"
 to_string (Direct c) = "/* @! */"++(to_string_all c)++"/* !@ */"
+to_string (Eval c) = "/* @eval */"++(to_string_all c)++"/* lave@ */"
 to_string (Concat) = ""
 to_string (Unquote s) = s
 to_string (Quote c) = "\""++(to_string_all c)++"\""

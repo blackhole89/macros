@@ -177,7 +177,8 @@ process ((Calc c):cs) = do c' <- process c
                            return $ c''++cs'
 -- variable read
 process ((Var s):cs) = do v <- getVar s
-                          process (show_vartree v ++ cs)
+                          cs' <- process cs
+                          return $ (show_vartree v) ++ cs' --process (show_vartree v ++ cs)
 -- variable write
 -- todo?: split DefLocal etc. into (DefLocal String):(VarTree): so we can @set $var1 $var2 
 -- (other solution?)
@@ -224,6 +225,11 @@ process ((Undef s):cs) = do delMacro s
 -- ignore for preprocessing
 process ((Direct c):cs) = do cs' <- process cs
                              return $ c++cs'
+-- process twice
+process ((Eval c):cs) = do c' <- process c
+                           c'' <- process c'
+                           cs' <- process cs
+                           return $ c''++cs'
 -- passthrough
 process ((Parentheses c):cs) = do c' <- Parentheses <$> process c
                                   cs' <- process cs
@@ -313,9 +319,9 @@ try_unif ((OneOrMore c s):ls) rs = let mklist rs = do pushFrame Map.empty
 -- substructure 
 -- process contents fully before unifying!
 try_unif ((Parentheses l):ls) ((Parentheses r):rs) = do r' <- process r
-                                                        tail <- try_unif l r
+                                                        tail <- try_unif l r'
                                                         if (trim tail) == [] then try_unif ls rs
-                                                        else throwError $ CantUnify (l,r)
+                                                        else throwError $ CantUnify (l,r')
 try_unif ((CurlyBraces l):ls) ((CurlyBraces r):rs) = try_unif ((Parentheses l):ls) ((Parentheses r):rs)
 try_unif ((SquareBrackets l):ls) ((SquareBrackets r):rs) = try_unif ((Parentheses l):ls) ((Parentheses r):rs)
 

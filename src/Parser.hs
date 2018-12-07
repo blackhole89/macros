@@ -37,7 +37,7 @@ langDef = javaStyle { P.reservedNames = ["@include",
                                          "@define", "@undef", 
                                          "@var", "@global", "@set", "@push_back",
                                          "@for", "@match", "@calc",
-                                         "@quote", "@unquote",
+                                         "@eval", "@quote", "@unquote",
                                          "@dumpstack"],
                       P.reservedOpNames = ["=>","@!","@*","@+","@^","@#"],
                       P.opLetter       = oneOf ":!#%&*+./<=>?\\^|-~",
@@ -82,6 +82,7 @@ parse_one =     parse_comment
             <|> parse_undef
             <|> parse_match
             <|> parse_direct
+            <|> parse_eval
             <|> parse_concat
             <|> parse_calc
             <|> parse_quote
@@ -163,6 +164,10 @@ parse_pushback = do reserved "@push_back"
 parse_direct = do reservedOp "@!"
                   c <- ( parens parser <|> brackets parser <|> braces parser <|> (parse_one >>= return.(:[])) )
                   return (Direct c)
+-- @eval a piece of code that is evaluated twice (so e.g. the contents of variables are macro-expanded)
+parse_eval = do reservedOp "@eval"
+                c <- ( parens parser <|> brackets parser <|> braces parser <|> (parse_one >>= return.(:[])) )
+                return (Eval c)
 -- concatenate two tokens, cf. ##
 parse_concat = do reservedOp "@@"
                   return Concat
