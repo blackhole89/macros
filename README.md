@@ -36,6 +36,8 @@ LinkedList *l = MakeList {1,2,3,4,5};
 Usage
 -----
 
+### Using GNU make (preferred)
+
 Make sure you have a recent version of `ghc`, `mtl`>=2.2.1 and `parsec` installed. The appropriate packages exist in Debian *testing* repositories as `ghc`, `libghc-mtl-dev` and `libghc-parsec3-dev` respectively; building under Windows or other unixoid OS families is currently untested. Run `make` in the root directory of the repository. This generates an executable file named `macros`. See `INSTALL.windows.md` for Windows installation instructions.
 Running
 ```
@@ -49,6 +51,21 @@ Running
 ```
 (with the input filename being in the second position, i.e. immediately following the compiler executable!) is equivalent to running
 `g++ -O2 -Dotheroptions` on the output of the preprocessor on `<input file>`.
+
+### Using Haskell Stack
+
+If you don't have access to a system package manager or it does not provide the necessary GHC packages, you can instead choose to use [Haskell Stack](https://docs.haskellstack.org/en/stable/README/). This may be the easiest way to build the project on non-Linux systems. After potentially installing Stack and running `stack build`, you should be able to execute the preprocessor by running
+```
+stack exec macros <input file>
+```
+which will preprocess the file and emit output to `stdout` as above.
+
+### To produce human-readable output
+
+Use the additional flag `-n` after the input file, which suppresses emission of source-line hints (which greatly help with debugging, but get in the way of comprehension), and pipe through `clang-format`, like so:
+```
+./macros <input file> -n | clang-format
+```
 
 Introduction
 ------------
