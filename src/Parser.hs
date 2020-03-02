@@ -162,23 +162,23 @@ parse_pushback = do reserved "@push_back"
 
 -- @! a piece of code that is quoted verbatim without macro expansion
 parse_direct = do reservedOp "@!"
-                  c <- ( parens parser <|> brackets parser <|> braces parser <|> (parse_one >>= return.(:[])) )
+                  c <- ( semistrict_parens parser <|> semistrict_brackets parser <|> semistrict_braces parser <|> (parse_one >>= return.(:[])) )
                   return (Direct c)
 -- @eval a piece of code that is evaluated twice (so e.g. the contents of variables are macro-expanded)
 parse_eval = do reserved "@eval"
-                c <- ( parens parser <|> brackets parser <|> braces parser <|> (parse_one >>= return.(:[])) )
+                c <- ( semistrict_parens parser <|> semistrict_brackets parser <|> semistrict_braces parser <|> (parse_one >>= return.(:[])) )
                 return (Eval c)
 -- concatenate two tokens, cf. ##
 parse_concat = do reservedOp "@@"
                   return Concat
 -- arithmetic
 parse_calc = do reserved "@calc"
-                c <- parens parser
+                c <- semistrict_parens parser
                 return (Calc c)
 
 -- strings <-> code
 parse_quote = do reserved "@quote"
-                 c <- parens parser
+                 c <- semistrict_parens parser
                  return (Quote c)
 
 parse_unquote = do reserved "@unquote"
@@ -256,7 +256,9 @@ strict_parens p   = between (string "(") (string ")") p
 strict_braces p   = between (string "{") (string "}") p
 strict_brackets p = between (string "[") (string "]") p
 
+semistrict_parens p   = between (symbol "(") (string ")") p
 semistrict_braces p   = between (symbol "{") (string "}") p
+semistrict_brackets p = between (symbol "[") (string "]") p
 
 isNewline c = c=='\n' || c=='\r'
 
